@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+#-*- coding: UTF-8 -*-
 import sys
 
 # from PySide2.QtWebEngineWidgets import QWebEngineView
@@ -13,8 +15,8 @@ from PySide2.QtWebEngineWidgets import QWebEngineView, QWebEngineSettings
 # --register-pepper-plugins="HCSFP64.dll"
 
 # url = "https://google.com"
-# url='https://ru6.darkorbit.com/'
-url="https://flashroom.ru/games1821.html"
+url='https://darkorbit.com/'
+# url="https://flashroom.ru/games1821.html"
 # url='https://tankionline.com/play/'
 
 class bview(QWebEngineView):
@@ -27,8 +29,16 @@ class bview(QWebEngineView):
   QWebEngineSettings.globalSettings().setAttribute(QWebEngineSettings.PluginsEnabled, True)
   QWebEngineSettings.globalSettings().setAttribute(QWebEngineSettings.JavascriptEnabled, True)
   QWebEngineSettings.globalSettings().setAttribute(QWebEngineSettings.FullScreenSupportEnabled, True)
+  self.urlChanged.connect(self.onUrlChanged)
+#   self.showFullScreen()
 #   self.settings().setAttribute(WebEngineSettings.PluginsEnabled, True)
-      
+ def setFullScreen(self):
+  self.showFullScreen()
+  
+ def onUrlChanged(self, uri):
+  if uri=="https://ru6.darkorbit.com/indexInternal.es?action=internalMapRevolution":
+      print(2)
+  print (uri)    
 
        
 
@@ -71,7 +81,10 @@ class QDO(QMainWindow):
         browser.load(QUrl(url))
 
     def onTitleChanged0(self, s):
+     try:
       self.tbb.setTabText(0, s)
+     except:
+      self.tbb.setTabText("0")
   
     def closeEvent(self, event):
         qs=QSettings('do.ini', 'lv')
@@ -100,9 +113,10 @@ if __name__ == '__main__':
   arg.append(a2)
 #   arg.append(a3)
   arg.append(a5)
+#   , '--ppapi-startup-dialog' '-enable-pepper-testing', ,  '--ppapi', '--ppapi-in-process'
   arg.extend(['-platform', 'windows:altgr', 'enable-accelerated-2d-canvas',
               '--default-background-color=000000ff', '--disable-bundled-ppapi-flash', '--ignore-gpu-blacklist',
-              '--in-process-gpu', '-enable-pepper-testing', '--ppapi', '--ppapi-in-process', '--ppapi-startup-dialog'])
+              '--in-process-gpu'])
 #               '--remote-debugging-port=9221'])
 
 
