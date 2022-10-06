@@ -19,8 +19,8 @@ from PySide2.QtGui import QKeySequence
 from PySide2 import QtWebEngineWidgets
 from PySide2.QtWebEngineWidgets import QWebEngineView, QWebEngineSettings
 
-#~ url='https://darkorbit.com/'
-url="https://www.w3schools.com/tags/tryit.asp?filename=tryhtml_a_target"
+url='https://darkorbit.com/'
+#~ url="https://www.w3schools.com/tags/tryit.asp?filename=tryhtml_a_target"
 uri2="https://%s.darkorbit.com/indexInternal.es?action=internalMapRevolution"
 serv='ru6'
 
