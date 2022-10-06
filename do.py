@@ -11,23 +11,16 @@ import sys
 #~ import math
 
 # from PySide2 import QtCore
-try:
- from PySide2.QtWidgets import QApplication, QMainWindow, QWidget, \
-     QVBoxLayout, QProgressBar,  QTabWidget
- from PySide2.QtCore import QUrl, QSettings
- from PySide2 import QtWebEngineWidgets
- from PySide2.QtWebEngineWidgets import QWebEngineView, QWebEngineSettings
- print('pyqt5')
-except:
- from PySide2.QtWidgets import QApplication, QMainWindow, QWidget, \
-     QVBoxLayout, QProgressBar,  QTabWidget
- from PySide2.QtCore import QUrl, QSettings
- from PySide2 import QtWebEngineWidgets
- from PySide2.QtWebEngineWidgets import QWebEngineView, QWebEngineSettings
- print('pyside2')
 
-url='https://darkorbit.com/'
-#~ url="https://www.w3schools.com/tags/tryit.asp?filename=tryhtml_a_target"
+from PySide2.QtWidgets import QApplication, QMainWindow, QWidget, \
+     QVBoxLayout, QProgressBar,  QTabWidget, QShortcut
+from PySide2.QtCore import QUrl, QSettings
+from PySide2.QtGui import QKeySequence 
+from PySide2 import QtWebEngineWidgets
+from PySide2.QtWebEngineWidgets import QWebEngineView, QWebEngineSettings
+
+#~ url='https://darkorbit.com/'
+url="https://www.w3schools.com/tags/tryit.asp?filename=tryhtml_a_target"
 uri2="https://%s.darkorbit.com/indexInternal.es?action=internalMapRevolution"
 serv='ru6'
 
@@ -40,8 +33,7 @@ ini_f='./do.ini'
 login=""
 passw=""
 
-class bview(QWebEngineView):
-    
+class bview(QWebEngineView):    
  def createWindow(self, type_):
   if not isinstance(self.window(), QMain):
    return
@@ -50,6 +42,7 @@ class bview(QWebEngineView):
 
  def __init__(self, parent=None ):
   super(bview, self).__init__(parent)
+  # m_fullScreenWindow=None
   self.p=None
 #         BigpointClient/1.4.6
   self.page().profile().setHttpUserAgent("BigpointClient/1.6.7")
@@ -58,6 +51,22 @@ class bview(QWebEngineView):
   QWebEngineSettings.globalSettings().setAttribute(QWebEngineSettings.JavascriptEnabled, True)
   QWebEngineSettings.globalSettings().setAttribute(QWebEngineSettings.FullScreenSupportEnabled, True)
   QWebEngineSettings.globalSettings().setAttribute(QWebEngineSettings.ShowScrollBars, False)
+  fs=QShortcut(QKeySequence("F11"), self)
+  fs.activated.connect(self.setFullScreen)
+  self.isFullScreen=False
+
+ def setFullScreen(self):
+  print('setFullScreen', self.isFullScreen)
+  if self.isFullScreen:
+    print(1)
+    self.showNormal()
+    self.isFullScreen=False
+  else:
+    print(2)
+    self.showFullScreen()
+    self.isFullScreen=True
+
+  # self.page().onFullScreenRequested.
 #   self.urlChanged.connect(self.onUrlChanged)
 #   self.page().linkHovered.connect(self.onLinkHovered)
 
