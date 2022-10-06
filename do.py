@@ -1,27 +1,49 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 #-*- coding: UTF-8 -*-
+# from functools import cached_property
+from django.utils.functional import cached_property
 import sys
+#~ import conf
+#~ import math
 
-# from PySide2.QtWebEngineWidgets import QWebEngineView
-
-from PySide2 import QtCore
-from PySide2.QtCore import QSettings
+# from PySide2 import QtCore
 from PySide2.QtWidgets import QApplication, QMainWindow, QWidget, \
-     QVBoxLayout, QStatusBar, QProgressBar, QToolBar, QTabWidget
-from PySide2.QtCore import QUrl
+     QVBoxLayout, QProgressBar,  QTabWidget
+from PySide2.QtCore import QUrl, QSettings
+from PySide2 import QtWebEngineWidgets
 from PySide2.QtWebEngineWidgets import QWebEngineView, QWebEngineSettings
 
 # --ppapi-flash-path="HCSFP64.dll"
 # --register-pepper-plugins="HCSFP64.dll"
 
+# url="./index.html"
 # url = "https://google.com"
 url='https://darkorbit.com/'
+#~ url="https://www.w3schools.com/tags/tryit.asp?filename=tryhtml_a_target"
+uri2="https://%s.darkorbit.com/indexInternal.es?action=internalMapRevolution"
+serv='ru6'
 # url="https://flashroom.ru/games1821.html"
 # url='https://tankionline.com/play/'
 
+# j_str='function f(){document.getElementById("bgcdw_login_form_username").value="21";getElementById("bgcdw_login_form_password").value="qwe";}'
+# j_str='document.write("121");'
+j_str='document.getElementById("bgcdw_login_form_username").value="%s";'
+j_str+='document.getElementById("bgcdw_login_form_password").value="%s"';
+ini_f='./do.ini'
+
+login=""
+passw=""
+
 class bview(QWebEngineView):
- def __init__(self, ):
-  super(bview, self).__init__()
+    
+ def createWindow(self, type_):
+  if not isinstance(self.window(), QMain):
+   return
+  if type_ == QtWebEngineWidgets.QWebEnginePage.WebBrowserTab:
+   return self.window().tab_widget.create_tab()
+
+ def __init__(self, parent=None ):
+  super(bview, self).__init__(parent)
   self.p=None
 #         BigpointClient/1.4.6
   self.page().profile().setHttpUserAgent("BigpointClient/1.6.7")
@@ -29,101 +51,155 @@ class bview(QWebEngineView):
   QWebEngineSettings.globalSettings().setAttribute(QWebEngineSettings.PluginsEnabled, True)
   QWebEngineSettings.globalSettings().setAttribute(QWebEngineSettings.JavascriptEnabled, True)
   QWebEngineSettings.globalSettings().setAttribute(QWebEngineSettings.FullScreenSupportEnabled, True)
-  self.urlChanged.connect(self.onUrlChanged)
+  QWebEngineSettings.globalSettings().setAttribute(QWebEngineSettings.ShowScrollBars, False)
+#   self.urlChanged.connect(self.onUrlChanged)
+#   self.page().linkHovered.connect(self.onLinkHovered)
+
+
 #   self.showFullScreen()
-#   self.settings().setAttribute(WebEngineSettings.PluginsEnabled, True)
- def setFullScreen(self):
-  self.showFullScreen()
   
- def onUrlChanged(self, uri):
-  if uri=="https://ru6.darkorbit.com/indexInternal.es?action=internalMapRevolution":
-      print(2)
-  print (uri)    
 
-       
+class TabWidget(QTabWidget):
+    def create_tab(self):
+        view = bview()
 
-class QDO(QMainWindow):
-    def __init__(self, *args, **kwargs):
-        super(QDO, self).__init__(*args, **kwargs)
-        wdg = QWidget()
+        index = self.addTab(view, "(Untitled)")
+        self.setTabIcon(index, view.icon())
+        view.titleChanged.connect(
+            lambda title, view=view: self.update_title(view, title)
+        )
+        view.iconChanged.connect(lambda icon, view=view: self.update_icon(view, icon))
+        self.setCurrentWidget(view)
+        return view
 
-        lay = QVBoxLayout(wdg)
-        lay.setSpacing(0)
-        lay.setMargin(0)
+    def update_title(self, view, title):
+        index = self.indexOf(view)
+        self.setTabText(index, title)
 
-        self.setCentralWidget(wdg)
-        self.tbb=QTabWidget()
+    def update_icon(self, view, icon):
+        index = self.indexOf(view)
+        self.setTabIcon(index, icon)
 
-        self.tbb.setTabsClosable(True)
-        self.hscale=QProgressBar(self)
-        self.hscale.setMaximum(100)
-        self.hscale.setMinimum(0)
-        # self.hscale.setValue(55)
-        self.hscale.setFixedHeight(2)
-        self.hscale.setTextVisible(False)
 
-        qs=QSettings('do.ini', 'lv')
-        try:
-            self.restoreGeometry(qs.value("geometry"))
-        except:
-            pass
-        browser = bview()
-
-        browser.loadStarted.connect(self.loadStartedHandler)
-        browser.loadProgress.connect(self.loadProgressHandler)
-        browser.loadFinished.connect(self.loadFinishedHandler)
-        browser.titleChanged.connect(self.onTitleChanged0)
-        self.tbb.addTab(browser, "")
-        wdg.setLayout(lay)
-        lay.addWidget(self.hscale)
-        lay.addWidget(self.tbb)
-        self.show()
-        browser.load(QUrl(url))
-
-    def onTitleChanged0(self, s):
-     try:
-      self.tbb.setTabText(0, s)
-     except:
-      self.tbb.setTabText("0")
+class QMain(QMainWindow):
+ def __init__(self, parent=None):
+  super(QMain, self).__init__(parent)
+  wdg = QWidget()
+  self.hscale=QProgressBar(self)
+  lay = QVBoxLayout(wdg)
+  lay.addWidget(self.hscale)
+  wdg.setLayout(lay)
+  lay.setSpacing(0)
+  lay.setMargin(0)
+  self.tbb=self.tab_widget
+  lay.addWidget(self.tbb)
+  self.setCentralWidget(wdg)
+  self.tbb.setTabsClosable(True)
+#   self.tbb.setIconSize(QSize(10, 10))
+  self.tbb.tabCloseRequested.connect(self.onTabCloseRequest)
   
-    def closeEvent(self, event):
-        qs=QSettings('do.ini', 'lv')
-        qs.setValue("geometry", self.saveGeometry())
-        qs.sync()
+  self.hscale.setMaximum(100)
+  self.hscale.setMinimum(0)
+  self.hscale.setFixedHeight(2)
+  self.hscale.setTextVisible(False)
+  qs=QSettings(ini_f, QSettings.IniFormat)
+  try:
+   self.restoreGeometry(qs.value("geometry"))
+  except:
+   pass
+  view = self.tab_widget.create_tab()
 
-    def loadStartedHandler(self):
-        self.hscale.setValue(0)
+  view.loadStarted.connect(self.loadStartedHandler)
+  view.loadProgress.connect(self.loadProgressHandler)
+  view.loadFinished.connect(self.loadFinishedHandler)
+  view.setZoomFactor(0.9)
+  view.setFocus()
+  try:
+   with open('./do.qss', "r") as h:
+    self.setStyleSheet(h.read())
+  except:
+    pass
+  view.load(QUrl(url))
+  
+ @cached_property
+ def tab_widget(self):
+  return TabWidget() 
 
-    def loadFinishedHandler(self):
-        self.hscale.setValue(0)
+ #~ def putAutoFill(self):
+  #~ w = self.tbb.widget(0)   
+  #~ w.page().runJavaScript(j_str%(login, passw));   
 
-    def loadProgressHandler(self, prog):
-        self.hscale.setValue(prog)
+#  def onCurrentChanged(self, i):
+#   w=self.tbb.widget(i)
+#   if w!=None:
+#    z=w.zoomFactor()
+#    try:
+#     z=str(int(math.ceil(100*z)))
+#    except ValueError:
+#     z='100'
+#   else:
+#    z='100'
+#   z=conf.scale_list.index(z)
+#   self.cb.setCurrentIndex(z)
+
+
+#  def onSelectionChange(self, i):
+  # w=self.tbb.widget(self.tbb.currentIndex())
+  # if w!= None:
+  #  w.setZoomFactor(int(conf.scale_list[i])/100)
+
+#  def onConfig(self):
+  # d=conf.Conf()
+  # ok, a,b,c=d.getConf()
+
+#  def setFullScreen(self):
+  # print('setFullScreen')
+  # self.showFullScreen()
+        
+ def onTabCloseRequest(self, index):
+  self.tbb.widget(index).close()  
+  self.tbb.removeTab(index)
+  if self.tbb.count()<=0:
+   self.close()
+
+    
+ #~ def onTitleChanged0(self, s):
+  #~ try:
+   #~ self.tbb.setTabText(0, s)
+  #~ except:
+   #~ self.tbb.setTabText("")
+  
+ def closeEvent(self, event):
+  qs=QSettings(ini_f, QSettings.IniFormat)
+  qs.setValue("geometry", self.saveGeometry())
+  qs.sync()
+
+ def loadStartedHandler(self):
+  self.hscale.setValue(0)
+
+ def loadFinishedHandler(self):
+  self.hscale.setValue(0)
+
+ def loadProgressHandler(self, prog):
+  self.hscale.setValue(prog)
+    
+   
         
 if __name__ == '__main__':
-  arg=sys.argv
-#   a1="--register-pepper-plugins=./HCSFP64.dll"
-  a2="--ppapi-flash-path=./HCSFP64.dll"
-#   a3='--ppapi-plugin-launcher=./HCSFP64.dll'
-#   a1="--register-pepper-plugins=HCSFP64.dll;application/x-shockwave-flash"  
-#   a1="--register-pepper-plugins=pepflashplayer.dll;application/x-shockwave-flash"
-#   a2="--ppapi-flash-path=pepflashplayer.dll"
-  a5="--ppapi-flash-version=26.0.0.137"
-#   arg.append(a1)
-  arg.append(a2)
-#   arg.append(a3)
-  arg.append(a5)
-#   , '--ppapi-startup-dialog' '-enable-pepper-testing', ,  '--ppapi', '--ppapi-in-process'
-  arg.extend(['-platform', 'windows:altgr', 'enable-accelerated-2d-canvas',
-              '--default-background-color=000000ff', '--disable-bundled-ppapi-flash', '--ignore-gpu-blacklist',
-              '--in-process-gpu'])
-#               '--remote-debugging-port=9221'])
+ arg=sys.argv
+ strs=[ 'enable-accelerated-2d-canvas',
+        '--default-background-color=000000ff', '--disable-bundled-ppapi-flash',
+        '--ignore-gpu-blacklist',
+        '--in-process-gpu', '--enable-smooth-scrolling']
+ if sys.platform.startswith('win'):
+  strs.extend(['-platform', 'windows:altgr', "--ppapi-flash-path=./HCSFP64.dll",
+               "--ppapi-flash-version=26.0.0.137"])
+ else:
+  strs.extend([ "--ppapi-flash-version=32.0.0.137",
+         "--ppapi-flash-path=./libpepfplashplayer.so"])
 
-
-
-  print(arg)
-  app = QApplication(arg)
-  # app.setStyleSheet("border: 1px solid;")
-  ex = QDO()
-
-  sys.exit(app.exec_())
+ arg.extend(strs)
+ app = QApplication(arg)
+ ex = QMain()
+ ex.show()
+ sys.exit(app.exec_())
