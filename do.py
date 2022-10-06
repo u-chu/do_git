@@ -1,29 +1,35 @@
 #!/usr/bin/env python
 #-*- coding: UTF-8 -*-
-# from functools import cached_property
-from django.utils.functional import cached_property
+try:
+ from functools import cached_property
+ print('functools')
+except:
+ from django.utils.functional import cached_property
+ print('django.utils.functional')
 import sys
 #~ import conf
 #~ import math
 
 # from PySide2 import QtCore
-from PySide2.QtWidgets import QApplication, QMainWindow, QWidget, \
+try:
+ from PySide2.QtWidgets import QApplication, QMainWindow, QWidget, \
      QVBoxLayout, QProgressBar,  QTabWidget
-from PySide2.QtCore import QUrl, QSettings
-from PySide2 import QtWebEngineWidgets
-from PySide2.QtWebEngineWidgets import QWebEngineView, QWebEngineSettings
+ from PySide2.QtCore import QUrl, QSettings
+ from PySide2 import QtWebEngineWidgets
+ from PySide2.QtWebEngineWidgets import QWebEngineView, QWebEngineSettings
+ print('pyqt5')
+except:
+ from PySide2.QtWidgets import QApplication, QMainWindow, QWidget, \
+     QVBoxLayout, QProgressBar,  QTabWidget
+ from PySide2.QtCore import QUrl, QSettings
+ from PySide2 import QtWebEngineWidgets
+ from PySide2.QtWebEngineWidgets import QWebEngineView, QWebEngineSettings
+ print('pyside2')
 
-# --ppapi-flash-path="HCSFP64.dll"
-# --register-pepper-plugins="HCSFP64.dll"
-
-# url="./index.html"
-# url = "https://google.com"
 url='https://darkorbit.com/'
 #~ url="https://www.w3schools.com/tags/tryit.asp?filename=tryhtml_a_target"
 uri2="https://%s.darkorbit.com/indexInternal.es?action=internalMapRevolution"
 serv='ru6'
-# url="https://flashroom.ru/games1821.html"
-# url='https://tankionline.com/play/'
 
 # j_str='function f(){document.getElementById("bgcdw_login_form_username").value="21";getElementById("bgcdw_login_form_password").value="qwe";}'
 # j_str='document.write("121");'
