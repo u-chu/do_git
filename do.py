@@ -6,7 +6,7 @@ try:
 except:
  from django.utils.functional import cached_property
  print('django.utils.functional')
-import sys
+import sys, os
 #~ import conf
 #~ import math
 
@@ -20,9 +20,9 @@ from PySide2 import QtWebEngineWidgets
 from PySide2.QtWebEngineWidgets import QWebEngineView, QWebEngineSettings
 
 url='https://darkorbit.com/'
-#~ url="https://www.w3schools.com/tags/tryit.asp?filename=tryhtml_a_target"
-uri2="https://%s.darkorbit.com/indexInternal.es?action=internalMapRevolution"
-serv='ru6'
+# url="https://www.w3schools.com/tags/tryit.asp?filename=tryhtml_a_target"
+# uri2="https://%s.darkorbit.com/indexInternal.es?action=internalMapRevolution"
+# serv='ru6'
 
 # j_str='function f(){document.getElementById("bgcdw_login_form_username").value="21";getElementById("bgcdw_login_form_password").value="qwe";}'
 # j_str='document.write("121");'
@@ -118,8 +118,10 @@ class QMain(QMainWindow):
   self.hscale.setFixedHeight(2)
   self.hscale.setTextVisible(False)
   qs=QSettings(ini_f, QSettings.IniFormat)
+  self.do_qss=''
   try:
    self.restoreGeometry(qs.value("geometry"))
+   self.do_qss=qs.value('qss')
   except:
    pass
   view = self.tab_widget.create_tab()
@@ -129,12 +131,16 @@ class QMain(QMainWindow):
   view.loadFinished.connect(self.loadFinishedHandler)
   view.setZoomFactor(0.9)
   view.setFocus()
+  print(self.do_qss)
+  if self.do_qss==None or self.do_qss=='':
+   do_qss=os.path.realpath(sys.argv[0]).replace('.py', '.qss')
+#   print(do_qss)
   try:
-   with open('./do.qss', "r") as h:
+   with open(do_qss, "r") as h:
     self.setStyleSheet(h.read())
   except:
     pass
-  view.load(QUrl(url))
+  # view.load(QUrl(url))
   
  @cached_property
  def tab_widget(self):
@@ -187,6 +193,7 @@ class QMain(QMainWindow):
  def closeEvent(self, event):
   qs=QSettings(ini_f, QSettings.IniFormat)
   qs.setValue("geometry", self.saveGeometry())
+  qs.setValue('qss', self.do_qss)
   qs.sync()
 
  def loadStartedHandler(self):

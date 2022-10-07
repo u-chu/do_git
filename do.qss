@@ -64,12 +64,23 @@ QLineEdit
 
 }
 
+QWebEnginePage
+{
+    background-color: #262729;
+}
+QWebEngine
+{
+    background-color: #262729;
+}
+
+
 /*-----QTabWidget-----*/
 
 QTabWidget
 {
 	border-top: 0px solid #C2C7CB; 
 	background-color: #262729;
+    /*background-color: #54565a;*/
 }
 
 QTabWidget::pane 
@@ -77,20 +88,6 @@ QTabWidget::pane
     border: none;
 	background-color: #262729;
 }
-QTabBar::close-button
-{
-    background-color: #acacad;
-    color: #fff;
-    padding: 3px;
-    background-image: url(:/qss_icons/rc/close.png);
-}
-
-QTabBar::close-button:hover
-{
-    background-color: #5c9cc2;
-    /*background: transparent;*/
-}
-
 QTabWidget::tab-bar 
 {
     left: 5px; 
@@ -100,6 +97,22 @@ QTabWidget::tab-bar
 QTabWidget::tab-bar:top {
     top: 1px;
 }
+
+QTabBar::close-button
+{
+    background-color: #acacad;
+    color: #fff;
+    padding: 3px;
+    /*background-image: url(:/qss_icons/rc/close.png);*/
+}
+
+QTabBar::close-button:hover
+{
+    background-color: #5c9cc2;
+    /*background: transparent;*/
+}
+
+
 
 QTabBar::tab 
 {
@@ -138,7 +151,6 @@ QTabBar::tab:hover
     font-weight: bold;
     background-color: #345a70;
 }
-
 
 /*-----QScrollBar-----*/
 QScrollBar:horizontal 
